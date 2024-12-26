@@ -37,10 +37,10 @@ Take a look at the platform in action:
 
 ## Installation
 
-    Clone the repository:
-
-git clone https://github.com/nyonge1471/Nyonks-elearning-platform.git
-cd  Nyonks-elearning-platform
+    git clone https://github.com/nyonge1471/Nyonks-elearning-platform.git
+ '''
+    cd  Nyonks-elearning-platform
+ 
 
 Install dependencies:
 
