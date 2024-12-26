@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bg-black min-h-screen p-6">
+    <div class="max-w-4xl mx-auto space-y-8">
+        <!-- Course Header -->
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-4xl font-bold text-white futuristic-text">{{ course.title }}</h1>
+            {% if current_user.is_authenticated %}
+                {% set is_enrolled = current_user.id in course.enrollments|map(attribute='user_id')|list %}
+                {% if not is_enrolled %}
+                    <form action="{{ url_for('enroll_course', course_id=course.id) }}" method="POST">
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-transform transform hover:scale-105 shadow-lg futuristic-button">
+                            Enroll Now
+                        </button>
+                    </form>
+                {% endif %}
+            {% endif %}
+        </div>
+
+        <!-- Course Image -->
+        <div class="flex justify-center items-center mb-6">
+            <div class="max-w-2xl h-96 bg-gray-900 rounded-lg overflow-hidden shadow-lg transition-transform transform hover:scale-105">
+                <img 
+                    src="{{ course.image_url }}" 
+                    alt="{{ course.title }}" 
+                    class="w-full h-full object-cover transition-transform duration-300 ease-in-out"
+                >
+            </div>
+        </div>
+
+        <!-- Admin Actions -->
+        {% if current_user.is_admin %}
+        <div class="text-right mt-4">
+            <a href="{{ url_for('view_course_questions', course_id=course.id) }}" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition-transform transform hover:scale-105 shadow-lg futuristic-button">
+                Manage Course Questions
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- Course Overview -->
+        <div class="bg-gray-800 shadow-lg rounded-lg p-6 space-y-4 futuristic-card">
+            <h2 class="text-2xl font-semibold text-white mb-3">Course Overview</h2>
+            <p class="text-gray-300">{{ course.introduction }}</p>
+        </div>
+
+        <!-- Course Materials -->
+        <div class="bg-gray-800 shadow-lg rounded-lg p-6 futuristic-card">
+            <h3 class="text-2xl font-semibold text-white mb-4">Course Materials</h3>
+            {% if course.materials %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for material in course.materials %}
+                        <div class="bg-gray-700 rounded-lg p-4 transition-transform transform hover:scale-105 futuristic-card">
+                            <h4 class="text-lg font-semibold text-gray-200 mb-2">{{ material.title }}</h4>
+                            {% if material.type == 'image' %}
+                                <img src="{{ url_for('static', filename='uploads/' ~ material.file_path) }}" 
+                                     alt="{{ material.title }}" 
+                                     class="w-full h-48 object-cover rounded-lg cursor-pointer"
+                                     onclick="openImageModal('{{ url_for('static', filename='uploads/' ~ material.file_path) }}')">
+                            {% elif material.type == 'video' %}
+                                <video class="w-full h-48 rounded-lg futuristic-video" controls>
+                                    <source src="{{ url_for('static', filename='uploads/' ~ material.file_path) }}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            {% else %}
+                                <p class="text-gray-400">Unsupported material type.</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-gray-500 text-center">No materials available for this course yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Take Quiz -->
+        {% if is_enrolled %}
+        <div class="mt-4 text-center">
+            <a href="{{ url_for('course_quiz', course_id=course.id) }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-transform transform hover:scale-105 shadow-lg futuristic-button">
+                Take Quiz
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal for Image Preview -->
+<div id="imageModal" class="fixed z-50 inset-0 bg-black bg-opacity-75 hidden items-center justify-center p-4">
+    <div class="relative max-w-4xl max-h-full">
+        <img id="modalImage" class="max-w-full max-h-full object-contain futuristic-image" src="" alt="Course Material Preview">
+        <button class="absolute top-0 right-0 p-4 text-white bg-gray-800 rounded-full hover:bg-gray-700 transition-transform transform hover:scale-110" onclick="closeImageModal()">✖</button>
+    </div>
+</div>
+
+<script>
+    // Open and close modal for image preview
+    function openImageModal(src) {
+        const modal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        modalImage.src = src;
+        modal.classList.remove('hidden');
+    }
+
+    function closeImageModal() {
+        const modal = document.getElementById('imageModal');
+        modal.classList.add('hidden');
+    }
+</script>
+
+{% endblock %}

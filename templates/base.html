@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}NYONKS - Online Learning Platform{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #000000;
+            --bg-secondary: #121212;
+            --text-primary: #e0e0e0;
+            --accent-color: #00ffff;
+            --hover-color: #00a3a3;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Futuristic Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 4px;
+        }
+
+        /* Glassmorphism Effects */
+        .glassmorphic {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Neon Hover Effects */
+        .neon-hover {
+            transition: all 0.3s ease;
+        }
+        .neon-hover:hover {
+            color: var(--accent-color);
+            text-shadow: 0 0 10px var(--accent-color);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .mobile-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--bg-secondary);
+                flex-direction: column;
+            }
+            .mobile-menu-toggle {
+                display: block;
+            }
+        }
+    </style>
+    <script>
+        // Dark mode and theme management
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+        }
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        window.onload = () => {
+            const theme = localStorage.getItem('theme');
+            if (theme === 'dark') document.documentElement.classList.add('dark');
+        }
+    </script>
+</head>
+ 
+<body class="min-h-screen flex flex-col bg-black text-gray-200">
+    <!-- Futuristic Header with Glassmorphic Design -->
+    <header class="fixed top-0 left-0 w-full z-50 glassmorphic shadow-2xl">
+        <nav class="container mx-auto flex justify-between items-center p-4 relative">
+            <a href="{{ url_for('index') }}" class="text-3xl font-bold text-cyan-400 neon-hover">NYONKS</a>
+            
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex items-center space-x-6">
+                <!-- Navigation links with neon hover effect -->
+                <a href="{{ url_for('index') }}" class="neon-hover px-3 py-2">Home</a>
+                <a href="{{ url_for('courses') }}" class="neon-hover px-3 py-2">Courses</a>
+                
+                <!-- User-specific navigation -->
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard') }}" class="neon-hover px-3 py-2">Dashboard</a>
+                    <a href="{{ url_for('profile') }}" class="neon-hover px-3 py-2">Profile</a>
+                    <a href="{{ url_for('logout') }}" class="neon-hover px-3 py-2">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="neon-hover px-3 py-2">Login</a>
+                    <a href="{{ url_for('register') }}" class="neon-hover px-3 py-2">Register</a>
+                {% endif %}
+                
+                <!-- Search and Theme Toggle -->
+                <div class="relative flex items-center space-x-4">
+                    <!-- Search Bar with Futuristic Design -->
+                    <div class="relative w-64">
+                        <form action="{{ url_for('search') }}" method="get" class="w-full">
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    name="query" 
+                                    id="search-input" 
+                                    placeholder="Search courses..." 
+                                    class="w-full px-4 py-2 bg-transparent border border-cyan-500/30 text-cyan-300 rounded-full focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all duration-300"
+                                >
+                                <button type="submit" class="absolute right-0 top-0 mt-2 mr-3">
+                                    <i class="fas fa-search text-cyan-400 hover:text-cyan-200"></i>
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <!-- Search Suggestions Dropdown -->
+                        <div 
+                            id="search-suggestions" 
+                            class="absolute z-50 w-full mt-2 bg-gray-900/90 backdrop-blur-lg rounded-lg shadow-2xl border border-cyan-500/20 hidden"
+                        >
+                            <!-- Suggestions will be dynamically populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Dark Mode Toggle -->
+                    <button 
+                        onclick="toggleDarkMode()" 
+                        class="text-cyan-400 hover:text-cyan-200 transition-colors duration-300"
+                    >
+                        <i class="fas fa-adjust"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button class="md:hidden text-cyan-400" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Mobile Menu (Hidden by default) -->
+    <div id="mobile-menu" class="hidden md:hidden fixed top-16 left-0 w-full bg-black/90 z-40">
+        <!-- Mobile menu items -->
+    </div>
+
+    <!-- Main Content with Top Padding -->
+    <main class="container mx-auto mt-24 px-4 flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Futuristic Footer -->
+    <footer class="bg-black/50 text-gray-300 py-6 mt-8">
+        <div class="container mx-auto text-center">
+            <p class="text-cyan-400">&copy; 2024 NYONKS. Future of Learning</p>
+        </div>
+    </footer>
+
+    <script>
+        const searchInput = document.getElementById('search-input');
+        const searchSugg estions = document.getElementById('search-suggestions');
+
+        searchInput.addEventListener('input', async (e) => {
+            const query = e.target.value;
+            if (query.length > 2) {
+                try {
+                    const response = await fetch(`/search_suggestions?query=${query}`);
+                    const suggestions = await response.json();
+                    
+                    searchSuggestions.innerHTML = '';
+                    suggestions.forEach(suggestion => {
+                        const div = document.createElement('div');
+                        div.classList.add(
+                            'p-3', 
+                            'hover:bg-cyan-900/30', 
+                            'cursor-pointer', 
+                            'text-cyan-300', 
+                            'border-b', 
+                            'border-cyan-500/20',
+                            'last:border-b-0'
+                        );
+                        div.innerHTML = `
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold">${suggestion.title}</span>
+                                <span class="text-xs text-cyan-500">${suggestion.instructor}</span>
+                            </div>
+                        `;
+                        div.addEventListener('click', () => {
+                            window.location.href = `/course/${suggestion.id}`;
+                        });
+                        searchSuggestions.appendChild(div);
+                    });
+                    
+                    if (suggestions.length > 0) {
+                        searchSuggestions.classList.remove('hidden');
+                    } else {
+                        searchSuggestions.classList.add('hidden');
+                    }
+                } catch (error) {
+                    console.error('Search suggestions error:', error);
+                }
+            } else {
+                searchSuggestions.classList.add('hidden');
+            }
+        });
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
+                searchSuggestions.classList.add('hidden');
+            }
+        });
+    </script>
+    
+</body>
+</html>

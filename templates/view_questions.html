@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto mt-10 p-6 max-w-4xl bg-gray-800 text-gray-100 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-bold mb-5 text-center animate-fade-in">
+        Questions for {{ course.title }}
+    </h2>
+
+    <a href="{{ url_for('add_course_question', course_id=course.id) }}" 
+        class="mb-5 inline-block py-2 px-4 bg-green-600 text-gray-100 font-semibold rounded-lg shadow-md hover:bg-green-500 transition duration-300 ease-in-out transform hover:scale-105">
+        Add New Question
+    </a>
+
+    {% if questions %}
+    <div class="overflow-x-auto bg-gray-900 rounded-lg shadow-lg">
+        <table class="min-w-full table-auto text-left">
+            <thead class="bg-gray-700 text-gray-100">
+                <tr>
+                    <th class="py-3 px-4 text-sm font-semibold">Question</th>
+                    <th class="py-3 px-4 text-sm font-semibold">Correct Answer</th>
+                    <th class="py-3 px-4 text-sm font-semibold">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="text-gray-200">
+                {% for question in questions %}
+                <tr class="hover:bg-gray-700 transition duration-300 ease-in-out">
+                    <td class="py-3 px-4">{{ question.question_text }}</td>
+                    <td class="py-3 px-4">{{ question.correct_answer }}</td>
+                    <td class="py-3 px-4">
+                        <form method="POST" action="{{ url_for('delete_question', question_id=question.id) }}" style="display:inline;">
+                            <button type="submit" class="bg-red-600 text-white py-1 px-3 rounded-lg hover:bg-red-500 transition duration-300 ease-in-out"
+                                onclick="return confirm('Are you sure?')">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-center text-gray-400 mt-4">No questions have been added to this course yet.</p>
+    {% endif %}
+</div>
+
+<style>
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.animate-fade-in {
+    animation: fade-in 1s ease-in-out;
+}
+</style>
+
+{% endblock %}

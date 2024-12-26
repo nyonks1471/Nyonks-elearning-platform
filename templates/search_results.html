@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-6 text-gray-100">Search Results for "{{ query }}"</h1>
+
+{% if courses %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for course in courses %}
+            <div class="bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+                <div class="p-6">
+                    <h2 class="text-xl font-bold mb-2 text-gray-200">{{ course.title }}</h2>
+                    <p class="text-gray-400 mb-4">{{ course.description[:100] }}...</p>
+                    <p class="text-sm text-gray-500 mb-4">Instructor: {{ course.instructor }}</p>
+                    <a href="{{ url_for('course_detail', course_id=course.id) }}" class="text-blue-400 hover:text-blue-500">
+                        View Details
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="text-gray-400">No courses found matching your search query.</p>
+{% endif %}
+{% endblock %}

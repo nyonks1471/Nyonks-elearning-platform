@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1 class="text-3xl font-bold text-gray-100 mb-6">{{ course.title }}</h1>
+  <div class="bg-gray-800 shadow-lg rounded px-8 pt-6 pb-8 mb-4">
+    <p class="text-gray-300 mb-4">{{ course.description }}</p>
+    <p class="text-sm text-gray-400 mb-4">Instructor: {{ course.instructor }}</p>
+
+    <!-- Course Rating -->
+    <div class="mb-4">
+      <h3 class="text-xl font-bold text-gray-100 mb-2">Course Rating</h3>
+      {% if course.ratings %}
+        {% set avg_rating = course.ratings | sum(attribute='rating') / course.ratings | length %}
+        <div class="flex items-center">
+          <div class="flex text-yellow-400">
+            {% for _ in range(5) %}
+              {% if loop.index <= avg_rating | round(0, 'floor') %}
+                <i class="fas fa-star"></i>
+              {% else %}
+                <i class="far fa-star"></i>
+              {% endif %}
+            {% endfor %}
+          </div>
+          <span class="ml-2 text-gray-300">{{ "%.1f"|format(avg_rating) }} ({{ course.ratings | length }} reviews)</span>
+        </div>
+      {% else %}
+        <p class="text-gray-300">No reviews yet.</p>
+      {% endif %}
+    </div>
+
+    <!-- Course Materials -->
+    <h2 class="text-2xl font-bold text-gray-100 mb-4">Course Materials</h2>
+    {% if course.materials %}
+      <ul class="list-disc list-inside text-gray-300">
+      {% for material in course.materials %}
+        <li class="mb-4">
+          <h3 class="text-xl font-semibold">{{ material.title }}</h3>
+          {% set enrolled_user_ids = [] %}
+          {% for enrollment in course.enrollments %}
+            {% set enrolled_user_ids = enrolled_user_ids + [enrollment.user_id] %}
+          {% endfor %}
+          {% if current_user.is_authenticated and current_user.id in enrolled_user_ids %}
+            {% set file_type = get_file_type(material.filename) %}
+            <div class="bg-gray-700 p-4 rounded">
+              {% if file_type == 'document' %}
+                <embed src="{{ url_for('download_material', material_id=material.id) }}" type="application/pdf" width="100%" height="600px" />
+              {% elif file_type == 'video' %}
+                <video width="100%" controls class="rounded">
+                  <source src="{{ url_for('download_material', material_id=material.id) }}" type="video/mp4">
+                  Your browser does not support the video tag.
+                </video>
+              {% elif file_type == 'audio' %}
+                <audio controls style="width:100%" class="rounded">
+                  <source src="{{ url_for('download_material', material_id=material.id) }}" type="audio/mpeg">
+                  Your browser does not support the audio element.
+                </audio>
+              {% elif file_type == 'image' %}
+                <img src="{{ url_for('download_material', material_id=material.id) }}" alt="Material Image" width="100%" class="rounded" />
+              {% elif file_type == 'presentation' %}
+                <iframe src="{{ url_for('download_material', material_id=material.id) }}" width="100%" height="600px"></iframe>
+              {% else %}
+                <a href="{{ url_for('download_material', material_id=material.id) }}" class="text-blue-400 hover:text-blue-600 ml-2">
+                  Download
+                </a>
+              {% endif %}
+            </div>
+          {% else %}
+            <p class="text-gray-400">Enroll to access this material</p>
+          {% endif %}
+        </li>
+      {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-gray-400">No materials available for this course yet.</p>
+    {% endif %}
+  </div>
+{% endblock %}

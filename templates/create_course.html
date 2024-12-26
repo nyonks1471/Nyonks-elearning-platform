@@ -1,0 +1,205 @@
+i want to be able to create  course more effectively and add things and be like an editor  and be efficient={% extends "base.html" %}
+
+{% block content %}
+<div class="bg-black min-h-screen p-8">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-100 mb-6">Create New Course</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mb-4 p-4 rounded 
+                        {% if category == 'success' %}bg-green-600 text-white
+                        {% elif category == 'danger' %}bg-red-600 text-white
+                        {% else %}bg-yellow-600 text-white{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('create_course') }}" 
+              enctype="multipart/form-data" 
+              id="courseForm"
+              class="bg-gray-800 shadow-lg rounded-lg px-8 pt-6 pb-8 mb-4">
+            
+            <!-- Course Basic Information -->
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Left Column -->
+                <div>
+                    <!-- Course Title -->
+                    <div class="mb-4">
+                        <label class="block text-gray-300 text-sm font-bold mb-2" for="title">
+                            Course Title <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="title" id="title" required
+                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                               placeholder="Enter course title">
+                    </div>
+
+                    <!-- Instructor -->
+                    <div class="mb-4">
+                        <label class="block text-gray-300 text-sm font-bold mb-2" for="instructor">
+                            Instructor <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="instructor" id="instructor" required
+                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                               placeholder="Enter instructor's name">
+                    </div>
+
+                    <!-- Course Category -->
+<div class="mb-4">
+    <label class="block text-gray-300 text-sm font-bold mb-2" for="category">
+        Course Category <span class="text-red-500">*</span>
+    </label>
+    <select name="category" id="category" required
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        <option value="">Select a Category</option>
+        {% for category in course_categories %}
+            <option value="{{ category }}">{{ category.replace('_', ' ').title() }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+                    <!-- Course Image -->
+                    <div class="mb-4">
+                        <label class="block text-gray-300 text-sm font-bold mb-2" for="course_image">
+                            Course Thumbnail
+                        </label>
+                        <input type="file" name="course_image" id="course_image" accept="image/*"
+                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <div id="image-preview" class="mt-2"></div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div>
+                    <!-- Course Description -->
+                    <div class="mb-4">
+                        <label class="block text-gray-300 text-sm font-bold mb-2" for="description">
+                            Course Description <span class="text-red-500">*</span>
+                        </label>
+                        <textarea name="description" id="description" rows="4" required
+                                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                  placeholder="Provide a detailed description of the course"></textarea>
+                        <p class="text-gray-500 text-xs italic">Maximum 500 characters</p>
+                    </div>
+
+                    <!-- Course Introduction -->
+                    <div class="mb-4">
+                        <label class="block text-gray-300 text-sm font-bold mb-2" for="introduction">
+                            Course Introduction
+                        </label>
+                        <textarea name="introduction" id="introduction" rows="6"
+                                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                                  placeholder="Write a detailed introduction about the course"></textarea>
+                        <p class="text-gray-500 text-xs italic">Maximum 2000 characters</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blog Media Section -->
+            <div class="mb-4 bg-gray-700 p-4 rounded">
+                <h3 class="text-xl font-semibold text-gray-200 mb-4">Blog Media</h3>
+                
+                <div class="flex space-x-4 mb-4">
+                    <input type="file" name="blog_images[]" id="blog_images" 
+                           multiple accept="image/*" class="hidden" onchange="previewBlogMedia(this, 'image')">
+                    <input type="file" name="blog_videos[]" id="blog_videos" 
+                           multiple accept="video/*" class="hidden" onchange="previewBlogMedia(this, 'video')">
+                    
+                    <button type="button" onclick="document.getElementById('blog_images').click()" 
+                            class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
+                        Add Images
+                    </button>
+                    <button type="button" onclick="document.getElementById('blog_videos').click()" 
+                            class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">
+                        Add Videos
+                    </button>
+                    <button type="button" id="add-link-btn" 
+                            class="bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded">
+                        Add Link
+                    </button>
+                </div>
+
+                <!-- Blog Media Preview -->
+                <div id="blog-media-preview" class="grid grid-cols-4 gap-4">
+                    <!-- Dynamic previews will be added here -->
+                </div>
+
+                <!-- Blog Links Container -->
+                <div id="blog-links-container" class="mt-4">
+                    <!-- Dynamically added links will appear here -->
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex justify-end">
+                <button type="submit" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">
+                    Create Course
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Image preview for course thumbnail
+    document.getElementById('course_image').addEventListener('change', function(event) {
+        const preview = document.getElementById('image-preview');
+        preview.innerHTML = '';
+        
+        if (event.target.files && event.target.files[0]) { const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.classList.add('w-full', 'h-auto', 'rounded');
+                preview.appendChild(img);
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    });
+
+    // Function to preview blog media
+    window.previewBlogMedia = function(input, type) {
+        const previewContainer = document.getElementById('blog-media-preview');
+        previewContainer.innerHTML = ''; // Clear previous previews
+
+        if (input.files) {
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const mediaElement = document.createElement(type === 'image' ? 'img' : 'video');
+                    mediaElement.src = e.target.result;
+                    mediaElement.classList.add('w-full', 'h-auto', 'rounded');
+                    if (type === 'video') {
+                        mediaElement.controls = true;
+                    }
+                    previewContainer.appendChild(mediaElement);
+                }
+                if (type === 'image') {
+                    reader.readAsDataURL(file);
+                } else {
+                    reader.readAsArrayBuffer(file); // For videos
+                }
+            });
+        }
+    };
+
+    // Add link functionality
+    document.getElementById('add-link-btn').addEventListener('click', function() {
+        const linkContainer = document.createElement('div');
+        linkContainer.classList.add('flex', 'space-x-2', 'mb-2');
+        linkContainer.innerHTML = `
+            <input type="text" name="blog_links[]" placeholder="Enter blog link" 
+                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            <button type="button" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded" 
+                    onclick="this.parentElement.remove()">Remove</button>
+        `;
+        document.getElementById('blog-links-container').appendChild(linkContainer);
+    });
+});
+</script>
+{% endblock %}

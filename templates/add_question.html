@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-black flex items-center justify-center p-6">
+    <div class="w-full max-w-2xl bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl shadow-blue-900/20 p-8">
+        <h2 class="text-3xl font-bold mb-8 text-center text-white bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
+            Add Question to {{ course.title }}
+        </h2>
+        
+        <form method="POST" class="space-y-6 relative">
+            <div class="group">
+                <label class="block text-sm font-medium mb-2 text-gray-300">Question Text</label>
+                <div class="relative">
+                    <textarea name="question_text" 
+                        class="w-full p-4 bg-gray-800 rounded-xl border border-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 text-white placeholder-gray-500 transition-all duration-300 ease-in-out"
+                        rows="4"
+                        placeholder="Enter your question here..."
+                        required></textarea>
+                    <div class="absolute inset-0 -z-10 opacity-0 group-focus-within:opacity-100 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl blur-lg transition-all duration-300"></div>
+                </div>
+            </div>
+
+            <div id="answers-container" class="space-y-4">
+                <label class="block text-sm font-medium mb-2 text-gray-300">Answers</label>
+                {% for i in range(4) %}
+                <div class="flex items-center space-x-3 group">
+                    <div class="relative flex-grow">
+                        <input type="text" name="answers" 
+                            class="w-full p-3 bg-gray-800 rounded-xl border border-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 text-white placeholder-gray-500 transition-all duration-300 ease-in-out" 
+                            placeholder="Enter answer {{ i+1 }}" 
+                            required>
+                        <div class="absolute inset-0 -z-10 opacity-0 group-focus-within:opacity-100 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl blur-lg transition-all duration-300"></div>
+                    </div>
+                    <div class="relative">
+                        <input type="radio" name="correct_answer" value="{{ i }}" 
+                            class="form-radio text-blue-500 bg-gray-800 border-gray-600 focus:ring-2 focus:ring-blue-500/50 w-5 h-5 transition-all duration-300" 
+                            required>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <button type="submit" 
+                class="w-full p-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold 
+                       hover:from-blue-700 hover:to-purple-700 transition-all duration-300 
+                       transform hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/30 
+                       focus:outline-none focus:ring-4 focus:ring-blue-500/50">
+                Add Question
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Optional: Add some interactive effects
+    const inputs = document.querySelectorAll('input, textarea');
+    inputs.forEach(input => {
+        input.addEventListener('focus', (e) => {
+            e.target.classList.add('border-blue-500');
+        });
+        input.addEventListener('blur', (e) => {
+            e.target.classList.remove('border-blue-500');
+        });
+    });
+</script>
+
+<style>
+    /* Custom scrollbar for dark theme */
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: #4a5568 #1a202c;
+    }
+    
+    *::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    *::-webkit-scrollbar-track {
+        background: #1a202c;
+    }
+    
+    *::-webkit-scrollbar-thumb {
+        background-color: #4a5568;
+        border-radius: 20px;
+    }
+</style>
+{% endblock %}

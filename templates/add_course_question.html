@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-gray-800 p-8 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-bold mb-6 text-gray-100">Add Question for {{ course.title }}</h2>
+    <form method="POST" action="{{ url_for('add_course_question', course_id=course.id) }}">
+        <div class="mb-4">
+            <label for="question_text" class="block text-gray-300 mb-2">Question</label>
+            <textarea name="question_text" id="question_text" rows="4" 
+                class="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none" 
+                required></textarea>
+        </div>
+        <div class="mb-4">
+            <label for="answers" class="block text-gray-300 mb-2">Answers (one per line)</label>
+            <textarea name="answers" id="answers" rows="4" 
+                class="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none" 
+                required></textarea>
+        </div>
+        <div class="mb-4">
+            <label for="correct_answer_index" class="block text-gray-300 mb-2">Correct Answer Index (0-based)</label>
+            <input type="number" name="correct_answer_index" id="correct_answer_index" 
+                class="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none" 
+                min="0" required>
+        </div>
+        <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+            Add Question
+        </button>
+    </form>
+</div>
+{% endblock %}

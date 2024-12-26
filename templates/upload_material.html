@@ -1,0 +1,73 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6 text-gray-100">Upload Course Material</h1>
+    <h2 class="text-2xl font-bold mb-4 text-gray-200">Course: {{ course.title }}</h2>
+
+    <form method="POST" enctype="multipart/form-data" class="bg-gray-800 shadow-lg rounded-lg px-8 pt-6 pb-8 mb-4">
+        {% csrf_token %}
+        
+        <div class="mb-4">
+            <label for="title" class="block text-gray-300 text-sm font-bold mb-2">Material Title</label>
+            <input type="text" id="title" name="title" 
+                   class="shadow appearance-none border border-gray-600 rounded w-full py-2 px-3 bg-gray-700 text-gray-300 leading-tight focus:outline-none focus:shadow-outline" 
+                   required 
+                   maxlength="100"
+                   placeholder="Enter material title">
+        </div>
+
+        <div class="mb-4">
+            <label for="description" class="block text-gray-300 text-sm font-bold mb-2">Description (Optional)</label>
+            <textarea id="description" name="description" 
+                      class="shadow appearance-none border border-gray-600 rounded w-full py-2 px-3 bg-gray-700 text-gray-300 leading-tight focus:outline-none focus:shadow-outline"
+                      rows="3"
+                      maxlength="500"
+                      placeholder="Provide a brief description of the material"></textarea>
+        </div>
+
+        <div class="mb-4">
+            <label for="file" class="block text-gray-300 text-sm font-bold mb-2">File</label>
+            <div class="flex items-center">
+                <input type="file" id="file" name="file" 
+                       class="shadow appearance-none border border-gray-600 rounded w-full py-2 px-3 bg-gray-700 text-gray-300 leading-tight focus:outline-none focus:shadow-outline" 
+                       required 
+                       accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.jpg,.png">
+                <span id="file-chosen" class="ml-4 text-gray-400">No file chosen</span>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Allowed file types: PDF, DOC, PPTX, TXT, JPG, PNG (Max 50MB)</p>
+        </div>
+
+        <div class="mb-4">
+            <label for="material_type" class="block text-gray-300 text-sm font-bold mb-2">Material Type</label>
+            <select id="material_type" name="material_type" 
+                    class="shadow appearance-none border border-gray-600 rounded w-full py-2 px-3 bg-gray-700 text-gray-300 leading-tight focus:outline-none focus:shadow-outline">
+                <option value="lecture_notes">Lecture Notes</option>
+                <option value="slides">Presentation Slides</option>
+                <option value="assignment">Assignment</option>
+                <option value="reading_material">Reading Material</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+
+        <div class="flex items-center justify-between">
+            <button type="submit" 
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Upload Material
+            </button>
+            <a href="{% url 'course_materials' course.id %}" 
+               class="text-gray-400 hover:text-gray-200 font-bold">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById('file').addEventListener('change', function(e) {
+    var fileName = e.target.files[0] ? e.target.files[0].name : 'No file chosen';
+    document.getElementById('file-chosen').textContent = fileName;
+});
+</script>
+{% endblock %}

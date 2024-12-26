@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-black text-white p-6">
+    <div class="max-w-7xl mx-auto space-y-8">
+        <!-- Dashboard Header -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">
+                Dashboard
+            </h1>
+            <div class="flex items-center space-x-4">
+                <div class="text-right">
+                    <p class="text-lg font-semibold">{{ current_user.username }}</p>
+                    <p class="text-sm text-gray-400">Learning Accelerator</p>
+                </div>
+                <img 
+                    src="{{ url_for('static', filename='uploads/' + (current_user.profile_pic if current_user.profile_pic else 'default_profile.png')) }}" 
+                    alt="Profile" 
+                    class="w-12 h-12 rounded-full ring-2 ring-purple-500"
+                >
+            </div>
+        </div>
+
+        <!-- Main Dashboard Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Learning Progress -->
+            <div class="bg-gray-900 rounded-2xl p-6 border border-purple-800/30 shadow-2xl">
+                <h2 class="text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">
+                    Learning Journey
+                </h2>
+                {% if current_user.enrollments %}
+                    <div class="space-y-4">
+                    {% for enrollment in current_user.enrollments %}
+                        <div class="bg-gray-800 rounded-xl p-4 transform transition-all hover:scale-105 hover:bg-gray-700">
+                            <div class="flex justify-between mb-2">
+                                <a href="{{ url_for('course_detail', course_id=enrollment.course.id) }}" 
+                                   class="text-lg font-semibold text-purple-300 hover:text-purple-200">
+                                    {{ enrollment.course.title }}
+                                </a>
+                                <span class="text-sm font-bold text-purple-500">
+                                    {{ enrollment.progress|int }}%
+                                </span>
+                            </div>
+                            <div class="w-full bg-gray-700 rounded-full h-2">
+                                <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full" 
+                                     style="width: {{ [enrollment.progress|int, 100]|min }}%;"></div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-500 text-center">No courses enrolled</p>
+                {% endif %}
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="bg-gray-900 rounded-2xl p-6 border border-purple-800/30 shadow-2xl">
+                <h2 class="text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">
+                    Quick Access
+                </h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <a href="{{ url_for('courses') }}" 
+                       class="bg-gray-800 rounded-xl p-4 text-center transform transition-all hover:scale-105 hover:bg-gray-700 group">
+                        <i class="fas fa-book-open text-3xl text-purple-500 mb-2 block group-hover:text-purple-400"></i>
+                        <span class="text-purple-300 group-hover:text-purple-200">Courses</span>
+                    </a>
+                    <a href="{{ url_for('profile') }}" 
+                       class="bg-gray-800 rounded-xl p-4 text-center transform transition-all hover:scale-105 hover:bg-gray-700 group">
+                        <i class="fas fa-user-circle text-3xl text-purple-500 mb-2 block group-hover:text-purple-400"></i>
+                        <span class="text-purple-300 group-hover:text-purple-200">Profile</span>
+                    </a>
+                    {% if current_user.is_admin %}
+                    <a href="{{ url_for('admin') }}" 
+                       class="bg-gray-800 rounded-xl p-4 text-center transform transition-all hover:scale-105 hover:bg-gray-700 group">
+                        <i class="fas fa-cogs text-3xl text-purple-500 mb-2 block group-hover:text-purple-400"></i>
+                        <span class="text-purple-300 group-hover:text-purple-200">Admin</span>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Notifications Section -->
+            <div class="bg-gray-900 rounded-2xl p-6 border border-purple-800/30 shadow-2xl">
+                <h2 class="text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">
+                    Notifications & Announcements
+                </h2>
+                <input type="text" id="notificationSearch" placeholder="Search notifications..." 
+                       class="p-2 rounded border border-gray-600 w-full mb-4 bg-gray-700 text-gray-200"
+                       onkeyup="filterNotifications()">
+                {% if current_user.notifications %}
+                    <div id="notificationList" class="space-y-4">
+                    {% for notification in current_user.notifications %}
+                        <div class="notification-item bg-gray-800 rounded-xl p-4 transform transition-all hover:scale-105 hover:bg-gray-700">
+                            <p class="text-lg font-semibold text-purple-300">{{ notification.message }}</p>
+                            <p class="text-sm text-gray-500">{{ notification.created_at }}</p>
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-500 text-center">No notifications</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function filterNotifications() {
+    const input = document.getElementById('notificationSearch');
+    const filter = input.value.toLowerCase();
+    const notifications = document.querySelectorAll('.notification-item');
+
+    notifications.forEach(notification => {
+        const message = notification.querySelector('p').textContent.toLowerCase();
+        notification.style.display = message.includes(filter) ? "block" : "none";
+    });
+}
+</script>
+{% endblock %}
